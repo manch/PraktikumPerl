@@ -90,14 +90,14 @@ sub getPlayerNumber{
 	$i = 1;
     }
     while ($i){
-	print "Wrong input\nYour number had to be four-digit without letters!\n\nTry again:\n";
+	print "Wrong input\nYour number had to be four-digit without the same letters!\n\nTry again:\n";
 	$userValue = <STDIN>;
 	chomp $userValue;
 	if ($self->numberOk($userValue)){
-	    $i = 1;
+	    $i = 0;
 	}
 	else{
-	    $i = 0
+	    $i = 1;
 	}
     }
     return $userValue;
