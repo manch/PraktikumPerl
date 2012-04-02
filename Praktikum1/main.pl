@@ -24,7 +24,7 @@ while ($i){
 	$i = 1;
     }
 }
-#print "The random number:\t",$randomNumber,"\n";
+print "The random number:\t",$randomNumber,"\n";
 
 print "Bulls and Cows\n\nLets play, give me a four-digit number:\n";
 $userValue = $core->getPlayerNumber;
