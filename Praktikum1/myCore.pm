@@ -1,5 +1,5 @@
 package myCore;
-
+use List::MoreUtils qw (uniq true);
 sub new {
     my ($class_name) = @_;
     my ($self) = {};
@@ -9,34 +9,14 @@ sub new {
     return $self;
 }
 
-sub numberOk{
+sub numberWrong{
     my ($self, $number) = @_;
     my $anzahl;
     my @array;
     @array = split(//,$number);
     $anzahl = @array;
-    if ($anzahl ne 4){
-	return 0;
-    }
-    if (@array[0] == @array[1]){
-	return 0;
-    }
-    elsif (@array[0] == @array[2]){
-	return 0;
-    }
-    elsif (@array[0] == @array[3]){
-	return 0;
-    }
-    elsif (@array[1] == @array[2]){
-	return 0;
-    }
-    elsif (@array[1] == @array[3]){
-	return 0;
-    }
-    elsif (@array[2] == @array[3]){
-	return 0;
-    }
-    return 1;
+    @array = uniq @array;
+    return ((true { defined($_) } @array) != 4);
 }
 
 sub getBulls{
@@ -83,22 +63,10 @@ sub getPlayerNumber{
     my $userValue;
     $userValue = <STDIN>;
     chomp $userValue;
-    if ($self->numberOk($userValue)){
-	$i = 0;
-    }
-    else{
-	$i = 1;
-    }
-    while ($i){
+     while ($self->numberWrong($userValue)){
 	print "Wrong input\nYour number had to be four-digit without the same letters!\n\nTry again:\n";
 	$userValue = <STDIN>;
 	chomp $userValue;
-	if ($self->numberOk($userValue)){
-	    $i = 0;
-	}
-	else{
-	    $i = 1;
-	}
     }
     return $userValue;
 }

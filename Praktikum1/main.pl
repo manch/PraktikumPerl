@@ -15,15 +15,10 @@ my $i;
 my $play;
 $play = 1;
 $i = 1;
-while ($i){
+do{
     $randomNumber = int(rand(8999)) + 1000;
-    if ($core->numberOk($randomNumber)){
-	$i = 0;
-    }
-    else{
-	$i = 1;
-    }
-}
+}while ($core->numberWrong($randomNumber));
+
 print "The random number:\t",$randomNumber,"\n";
 
 print "Bulls and Cows\n\nLets play, give me a four-digit number:\n";
