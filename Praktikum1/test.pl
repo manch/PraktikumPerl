@@ -11,7 +11,7 @@ print @array,"\n";
 if ( any { ! defined($_) } @array ) {
     print "ANY machter\n";
 } 
-if ( all { defined($_) } @array ) {
+if ( all { $_ == 1) } @a ) {
     print "ALL machter\n";
 }
 @a = uniq @a;
