@@ -23,15 +23,12 @@ print "The random number:\t",$randomNumber,"\n";
 
 print "Bulls and Cows\n\nLets play, give me a four-digit number:\n";
 $userValue = $core->getPlayerNumber;
-while($play){
+while($randomNumber ne $userValue){
  
-    if ($randomNumber eq $userValue){
-        print "WIN WIN WIN\n";
-	$play =0;
-    }
-    else{
         print "Bull:\t",$core->getBulls($randomNumber,$userValue),"\nCow:\t",$core->getCows($randomNumber,$userValue),"\n";
 	print "Try again, give me a four-digit number:\n";
 	$userValue = $core->getPlayerNumber;
-    }
 }
+print "WIN WIN WIN\n";
+$play =0;
+    
