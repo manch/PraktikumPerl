@@ -3,18 +3,9 @@ use warnings;
 use strict;
 use myCore;
 
-#$| =1;
-#vierstellige nr ziehen
-#pruefen oder one step back
-
 my $randomNumber;
-my $core;
-$core = new myCore;
 my $userValue;
-my $i;
-my $play;
-$play = 1;
-$i = 1;
+my $core = new myCore;
 do{
     $randomNumber = int(rand(8999)) + 1000;
 }while ($core->numberWrong($randomNumber));
@@ -30,5 +21,4 @@ while($randomNumber ne $userValue){
 	$userValue = $core->getPlayerNumber;
 }
 print "WIN WIN WIN\n";
-$play =0;
     

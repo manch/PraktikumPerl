@@ -11,25 +11,19 @@ sub new {
 
 sub numberWrong{
     my ($self, $number) = @_;
-    my $anzahl;
-    my @array;
-    @array = split(//,$number);
-    $anzahl = @array;
+    my @array = split(//,$number);
+    my $anzahl = @array;
     @array = uniq @array;
     return ((true { defined($_) } @array) != 4);
 }
 
 sub getBulls{
     my ($self,$randomNumber,$userValue) = @_;
-    my @random;
-    my @users;
-    @random = split(//,$randomNumber);
-    @users = split(//,$userValue);
-    my $i;
-    my $counter;
-    $counter = 0;
-    for( $i = 0 ; $i < 4 ; $i++ ){
-	if (@random[$i] eq @users[$i]){
+    my @random = split(//,$randomNumber);
+    my @users = split(//,$userValue);
+    my $counter = 0;
+    for(0..3 ){
+	if (@random[$_] eq @users[$_]){
 	    $counter++;
 	}
     }
@@ -38,20 +32,15 @@ sub getBulls{
 
 sub getCows{
     my ($self, $randomNumber, $userValue) = @_;
-    my @random;
-    my @users;
-    @random = split(//,$randomNumber);
-    @users = split(//,$userValue);
-    my $i;
-    my $j;
-    my $counter;
+    my @random = split(//,$randomNumber);
+    my @users = split(//,$userValue);
+    my $i, $counter;
     $counter = 0;
-    for ( $i = 0 ; $i < 4 ; $i++){
-	for ( $j = 0 ; $j < 4 ; $j++){
-	    if($i != $j){
-		if(@random[$i] eq @users[$j]){
-		    $counter++;
-		}
+    for (0..3){
+	$i = $_;
+	for (0..3){
+	    if( ( $i != $_ ) && ( @random[$i] eq @users[$_] ) ){
+		$counter++;
 	    }
 	}
     }
@@ -60,10 +49,9 @@ sub getCows{
 
 sub getPlayerNumber{
     my ($self) = @_;
-    my $userValue;
-    $userValue = <STDIN>;
+    my $userValue = <STDIN>;
     chomp $userValue;
-     while ($self->numberWrong($userValue)){
+    while ($self->numberWrong($userValue)){
 	print "Wrong input\nYour number had to be four-digit without the same letters!\n\nTry again:\n";
 	$userValue = <STDIN>;
 	chomp $userValue;
