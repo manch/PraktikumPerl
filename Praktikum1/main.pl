@@ -3,12 +3,9 @@ use warnings;
 use strict;
 use myCore;
 
-my $randomNumber;
-my $userValue;
 my $core = new myCore;
-do{
-    $randomNumber = int(rand(8999)) + 1000;
-}while ($core->numberWrong($randomNumber));
+my $randomNumber = $core->getRandomNumber;
+my $userValue;
 
 print "The random number:\t",$randomNumber,"\n";
 

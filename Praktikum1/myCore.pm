@@ -1,5 +1,6 @@
 package myCore;
 use List::MoreUtils qw (uniq true);
+
 sub new {
     my ($class_name) = @_;
     my ($self) = {};
@@ -58,4 +59,14 @@ sub getPlayerNumber{
     }
     return $userValue;
 }
+
+sub getRandomNumber{
+    my ($self) = @_;
+    my $randomNumber;
+    do{
+	$randomNumber = int(rand(8999)) + 1000;
+    }while($self->numberWrong($randomNumber));
+    return $randomNumber;
+}
+
 1;
