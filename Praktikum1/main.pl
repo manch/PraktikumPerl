@@ -11,8 +11,8 @@ print "The random number:\t",$randomNumber,"\n";
 
 print "Bulls and Cows\n\nLets play, give me a four-digit number:\n";
 $userValue = $core->getPlayerNumber;
-while($randomNumber ne $userValue){
- 
+
+while ($core->isNotFinish($randomNumber, $userValue)){ 
         print "Bull:\t",$core->getBulls($randomNumber,$userValue),"\nCow:\t",$core->getCows($randomNumber,$userValue),"\n";
 	print "Try again, give me a four-digit number:\n";
 	$userValue = $core->getPlayerNumber;

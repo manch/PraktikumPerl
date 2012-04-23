@@ -1,5 +1,8 @@
 package myCore;
-use List::MoreUtils qw (uniq true);
+use strict;
+use warnings;
+use List::MoreUtils qw (uniq true all any);
+use Data::Random qw (:all);
 
 sub new {
     my ($class_name) = @_;
@@ -23,7 +26,7 @@ sub getBulls{
     my @random = split(//,$randomNumber);
     my @users = split(//,$userValue);
     my $counter = 0;
-    for(0..3 ){
+    for( 0..3 ){
 	if (@random[$_] eq @users[$_]){
 	    $counter++;
 	}
@@ -37,12 +40,10 @@ sub getCows{
     my @users = split(//,$userValue);
     my $i, $counter;
     $counter = 0;
-    for (0..3){
-	$i = $_;
-	for (0..3){
-	    if( ( $i != $_ ) && ( @random[$i] eq @users[$_] ) ){
-		$counter++;
-	    }
+    for my $i (0..$#users){
+	if ((any { $users[$i] == $_ } @random) && ( $users[$i] != $random[$i]))
+	{
+	    ++$counter;
 	}
     }
     return $counter;
@@ -62,11 +63,15 @@ sub getPlayerNumber{
 
 sub getRandomNumber{
     my ($self) = @_;
-    my $randomNumber;
-    do{
-	$randomNumber = int(rand(8999)) + 1000;
-    }while($self->numberWrong($randomNumber));
-    return $randomNumber;
+    my @randomNumAr = rand_chars(set => [1..9], size=>4);
+    return join "",@{randomNumAr};
+}
+
+sub isNotFinish{
+    my ($self, $randomNumber, $userValue) = @_;
+    my @random = split(//,$randomNumber);
+    my @users = split(//,$userValue);
+    return ! all { $random[$_] == $users[$_] } (0..$#users)
 }
 
 1;
