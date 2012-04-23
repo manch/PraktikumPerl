@@ -18,6 +18,7 @@ sub numberWrong{
     my @array = split(//,$number);
     my $anzahl = @array;
     @array = uniq @array;
+    return (any { $_ == 0 } @array);
     return ((true { defined($_) } @array) != 4);
 }
 
