@@ -27,7 +27,7 @@ sub getBulls{
     my @users = split(//,$userValue);
     my $counter = 0;
     for( 0..3 ){
-	if (@random[$_] eq @users[$_]){
+	if ($random[$_] eq $users[$_]){
 	    $counter++;
 	}
     }
@@ -38,7 +38,7 @@ sub getCows{
     my ($self, $randomNumber, $userValue) = @_;
     my @random = split(//,$randomNumber);
     my @users = split(//,$userValue);
-    my $i, $counter;
+    my $counter;
     $counter = 0;
     for my $i (0..$#users){
 	if ((any { $users[$i] == $_ } @random) && ( $users[$i] != $random[$i]))
@@ -51,12 +51,10 @@ sub getCows{
 
 sub getPlayerNumber{
     my ($self) = @_;
-    my $userValue = <STDIN>;
-    chomp $userValue;
+    chomp( my $userValue = <STDIN>);
     while ($self->numberWrong($userValue)){
 	print "Wrong input\nYour number had to be four-digit without the same letters!\n\nTry again:\n";
-	$userValue = <STDIN>;
-	chomp $userValue;
+	chomp ( $userValue = <STDIN>);
     }
     return $userValue;
 }
