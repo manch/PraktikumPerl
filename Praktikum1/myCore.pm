@@ -18,8 +18,8 @@ sub numberWrong{
     my @array = split(//,$number);
     my $anzahl = @array;
     @array = uniq @array;
+    return 1 if ((true { defined($_) } @array) != 4);
     return (any { $_ == 0 } @array);
-    return ((true { defined($_) } @array) != 4);
 }
 
 sub getBulls{

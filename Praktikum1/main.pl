@@ -18,4 +18,13 @@ while ($core->isNotFinish($randomNumber, $userValue)){
 	$userValue = $core->getPlayerNumber;
 }
 print "WIN WIN WIN\n";
-    
+   
+=head1 NAME
+
+Praktikum 1
+
+=head2 DESCRIPTION
+
+The Game Bulls and Cows
+
+=cut
