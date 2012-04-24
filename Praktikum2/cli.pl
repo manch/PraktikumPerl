@@ -50,6 +50,11 @@ while(<stdin>){
 	print "(AdressVerwaltung) ";
 	next;
     }
+    if($input eq "exit"){
+	last;
+    }
+    print "(AdressVerwaltung) ";
+
 }
 
 sub newAdress{
@@ -85,7 +90,7 @@ sub list{
 
 sub browseHelp{
     print "e\tAdd a new adress\n\tForm: 'key:value'\n\tLast item form: '.key:value'\n\n";
-    print "a id\tChange or add an adress item: 'key:value'\tLast item with: '.key:value'\n\n";
+    print "a id\tChange or add an adress item: 'key:value'\n\tLast item with: '.key:value'\n\n";
     print "d id\tDelete adress on this id\n\n";
     print "l id\tBrowse adress on the given id formated\n\n";
     print "l\tBrowse all adresses\n\n";
