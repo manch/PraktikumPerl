@@ -4,7 +4,7 @@ use warnings;
 use Moose;
 
 has id => (is => "ro");
-has name =>(is => "rw");
+has name =>(is => "rw", isa => "Str");
 has lastName=>(is=>"rw");
 has from=>(is=>"rw");
 has plz=>(is=>"rw");
