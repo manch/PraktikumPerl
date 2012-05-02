@@ -59,8 +59,8 @@ while(<stdin>){
 
 sub newAdress{
     print "(newAdress) ";
+    #$id = scalar keys %adresses;
     $id += 1;
-    
     while (<stdin>){
 	chomp($input = $_);
 	if(substr($input,0,1) eq "."){
@@ -68,23 +68,22 @@ sub newAdress{
 	    shift @tmp;
 	    $input = join "",@tmp;
 	    @inputArray = split(":",$input);
-	    $adresses{"ID"}{"$id"}{"$inputArray[0]"} = "$inputArray[1]";
+	    $adresses{"$id"}{"$inputArray[0]"} = "$inputArray[1]";
 	    last;
 	}
 	@inputArray = split(":",$input);
-	$adresses{"ID"}{"$id"}{"$inputArray[0]"} = $inputArray[1];
+	$adresses{"$id"}{"$inputArray[0]"} = $inputArray[1];
 	print "(newAdress) ";
     }
 }
 
 sub list{
     foreach my $k1 ( sort keys %adresses ) {
+	print "ID\t$k1:\n";
 	foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
-	    foreach my $k3 ( sort keys %{$adresses{$k1}{$k2}} ) {
-		print "$k1\t$k2\t$k3\t$adresses{$k1}{$k2}{$k3}\n";
-	    }
-	    print "\n";
+	    print "\t$k2\t$adresses{$k1}{$k2}\n";
 	}
+	print "\n";
     }
 }
 
@@ -101,14 +100,12 @@ sub browseHelp{
 sub listById{
     my ($curId) = @_;
     foreach my $k1 ( sort keys %adresses ) {
-	foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
-	    if ($curId eq $k2){
-		foreach my $k3 ( sort keys %{$adresses{$k1}{$k2}} ) {
-		    print "$k1\t$k2\t$k3\t$adresses{$k1}{$k2}{$k3}\n";
-		}
+	if ($curId eq $k1){
+	    foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
+		    print "$k1\t$k2\t$adresses{$k1}{$k2}\n";
 	    }
-	    print "\n";
 	}
+	    print "\n";
     }
 }
 
@@ -125,16 +122,14 @@ sub appendAdress{
 	    $input = join "",@tmp;
 	    @inputArray = split(":",$input);
 	    foreach my $k1 ( sort keys %adresses ) {
-		foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
-		    if($curId eq $k2){
-			foreach my $k3 ( sort keys %{$adresses{$k1}{$k2}} ) {
-			    if ($k3 eq $inputArray[0]){
-				delete $adresses{$k1}{$k2}{$k3};
-				$adresses{"ID"}{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-			    }
-			    else{
-				$adresses{"ID"}{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-			    }
+		if($curId eq $k1){
+		    foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
+			if ($k2 eq $inputArray[0]){
+			    delete $adresses{$k1}{$k2};
+			    $adresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
+			}
+			else{
+			    $adresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
 			}
 		    }
 		}
@@ -144,16 +139,14 @@ sub appendAdress{
 	@inputArray = split(":",$input);
 
 	foreach my $k1 ( sort keys %adresses ) {
-	    foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
-		if($curId eq $k2){
-		    foreach my $k3 ( sort keys %{$adresses{$k1}{$k2}} ) {
-		        if ($k3 eq $inputArray[0]){
-			    delete $adresses{$k1}{$k2}{$k3};
-			    $adresses{"ID"}{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-		        }
-		        else{
-			    $adresses{"ID"}{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-		        }
+	    if($curId eq $k1){
+		foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
+		    if ($k2 eq $inputArray[0]){
+			delete $adresses{$k1}{$k2};
+			$adresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
+		    }
+		    else{
+			$adresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
 		    }
 		}
 	    }
@@ -165,14 +158,14 @@ sub appendAdress{
 sub deleteById{
     my ($curId) = @_;
     foreach my $k1 ( sort keys %adresses ) {
-	foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
-	    if ($curId eq $k2){
-		foreach my $k3 ( sort keys %{$adresses{$k1}{$k2}} ) {
-    		    print "$k1\t$k2\t$k3\t$adresses{$k1}{$k2}{$k3}\n";
-		    delete $adresses{$k1}{$k2}{$k3};
-		}
-		print "Deleted\n";
+	if ($curId eq $k1){
+	    print "ID\t$k1:\n";
+	    foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
+		    print "\t$k2\t$adresses{$k1}{$k2}\n";
+		    delete $adresses{$k1}{$k2};
+		    delete $adresses{$k1};
 	    }
+	    print "Deleted\n";
 	}
     }
 }
@@ -181,13 +174,10 @@ sub searchText{
     my ($searchText) = @_;
     foreach my $k1 ( sort keys %adresses ) {
 	foreach my $k2 ( sort keys %{$adresses{$k1}} ) {
-	    foreach my $k3 ( sort keys %{$adresses{$k1}{$k2}} ) {
-		if($adresses{$k1}{$k2}{$k3} =~ $searchText){
-		    listById($k2);
-		}
+	    if($adresses{$k1}{$k2} =~ $searchText){
+		listById($k1);
 	    }
-	    print "\n";
 	}
+	print "\n";
     }
-
 }
