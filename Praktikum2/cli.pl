@@ -48,31 +48,20 @@ while(1){
 }
 
 sub newAdress{
-    #$id = scalar keys %adresses;
     $id += 1;
     while (1){
 	print "(newAdress) ";
 	chomp($input = <stdin>);
-	if(substr($input,0,1) eq "."){
-	    my @tmp = split(//,$input);
-	    shift @tmp;
-	    $input = join "",@tmp;
-	    @inputArray = split(":",$input);
-	    $addresses{"$id"}{"$inputArray[0]"} = "$inputArray[1]";
-	    last;
-	}
+	if($input eq "") {redo;}
+	if($input eq "."){last;};
 	@inputArray = split(":",$input);
 	$addresses{"$id"}{"$inputArray[0]"} = $inputArray[1];
-	#print "(newAdress) ";
     }
 }
 
 sub list{
     foreach my $k1 ( sort keys %addresses ) {
-	print "ID\t$k1:\n";
-	foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-	    print "\t$k2\t$addresses{$k1}{$k2}\n";
-	}
+	listById($k1);
 	print "\n";
     }
 }
@@ -107,28 +96,9 @@ sub appendAdress{
     while (1){
 	print "(appendAddress) ";
 	chomp($input = <stdin>);
-	if(substr($input,0,1) eq "."){
-	    my @tmp = split(//,$input);
-	    shift @tmp;
-	    $input = join "",@tmp;
-	    @inputArray = split(":",$input);
-	    foreach my $k1 ( sort keys %addresses ) {
-		if($curId eq $k1){
-		    foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-			if ($k2 eq $inputArray[0]){
-			    delete $addresses{$k1}{$k2};
-			    $addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-			}
-			else{
-			    $addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-			}
-		    }
-		}
-	    }
-	    last;
-	}
+	if($input eq "") {redo;}
+	if($input eq "."){last;};
 	@inputArray = split(":",$input);
-
 	foreach my $k1 ( sort keys %addresses ) {
 	    if($curId eq $k1){
 		foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
@@ -170,3 +140,59 @@ sub searchText{
 	}
     }
 }
+
+=pod
+
+=head1 Name
+
+Addressmangementsystem - Just a small mangementsystem
+
+=head1 
+
+=head1 Usage
+
+F<cli.pl>
+
+=head1
+
+=head1 Helptext
+
+=over 
+
+=item
+
+e = Add a new address:
+	Form: 'key:value'
+	Last item form: '.key:value'
+
+=item
+
+a id = Change or add an adress item: 
+	Form:'key:value'
+	Last item with: '.key:value'
+
+=item
+
+d id = Delete address on this id
+
+=item
+
+l id = Browse address on the given id formated
+
+=item
+
+l = Browse all addresses
+
+=item
+
+h = Help
+
+=item
+
+s text = Search text in all addresses and browse these address
+
+=back
+
+=head1
+
+=cut
