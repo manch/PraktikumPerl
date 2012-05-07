@@ -21,7 +21,7 @@ class myAddress{
 		    }
 	);
     
-    method browse_address {
+    method browse {
 	print "Name:\t\t".$self->name."\n";
 	print "Lastname:\t".$self->lastname."\n";
 	

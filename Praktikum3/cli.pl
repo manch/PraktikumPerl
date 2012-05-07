@@ -1,17 +1,16 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
-
+use Storable qw (store retrieve);
 use myAddressBook;
 use myAddress;
 
-my $addressBook = myAddressBook->new();
-    
-my $input;
-my $id=0;
-my @inputArray;
-my %addresses =();
+#wird für storeable gebraucht
+if ( -e "data" ){ "print Datei vorhanden\n";}else{print "Datei nicht vorhanden";}; 
 
+my $addressBook = myAddressBook->new();
+my $input;
+my @inputArray;
 
 while(1){
     print "(Address Management) ";
@@ -46,7 +45,7 @@ while(1){
 	searchText($inputArray[1]);
 	redo;
     }
-    if($input eq "exit"){
+    if($input eq "exit" || $input eq "q" || $input eq "quit"){
 	last;
     }
 }
@@ -80,8 +79,8 @@ sub list{
 }
 
 sub browseHelp{
-    print "e\tAdd a new address\n\tForm: 'key:value'\n\tLast item form: '.key:value'\n\n";
-    print "a id\tChange or add an adress item: 'key:value'\n\tLast item with: '.key:value'\n\n";
+    print "e\tAdd a new address\n\tForm: 'key:value'\n\tFinish with '.'\n\n";
+    print "a id\tChange or add an adress item: 'key:value'\n\tFinish with '.'\n\n";
     print "d id\tDelete address on this id\n\n";
     print "l id\tBrowse address on the given id formated\n\n";
     print "l\tBrowse all addresses\n\n";
@@ -91,8 +90,10 @@ sub browseHelp{
 
 sub listById{
     my ($curId) = @_;
-    if ($addressBook->address_exists($curId)){
-	$addressBook->get_address($curId)->browse_address;
+    my $realId = $curId - 1;
+    if ($addressBook->address_exists($realId)){
+	print "ID:\t\t$curId\n";
+	$addressBook->get_address($realId)->browse;
     }
 }
 
@@ -100,6 +101,7 @@ sub appendAdress{
     my ($curId) = @_;
     print "The adress you want to change:\n\n";
     listById($curId);
+    $curId--;
     if($addressBook->address_exists($curId)){
 	my $address = $addressBook->get_address($curId);
 	while (1){
@@ -117,21 +119,18 @@ sub appendAdress{
 
 sub deleteById{
     my ($curId) = @_;
+    $curId--;
     if($addressBook->address_exists($curId)){
+	$addressBook->get_address($curId)->browse;
+	print "Address deleted!\n";
 	$addressBook->delete_address($curId);
     }
 }
 
-#sub searchText{
-#    my ($searchText) = @_;
-#    foreach my $k1 ( sort keys %addresses ) {
-#	foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-#	    if($addresses{$k1}{$k2} =~ $searchText){
-#		listById($k1);
-#	    }
-#	}
-#   }
-#}
+sub searchText{
+    my ($searchText) = @_;
+    $addressBook->search_Text($searchText);
+}
 
 =pod
 

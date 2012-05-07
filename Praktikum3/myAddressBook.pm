@@ -31,12 +31,20 @@ class myAddressBook{
 	print "Contacts:\t".$self->num_address."\n";
 	my $Id = 0;
 	foreach my $address ($self->address){
-	    print "ID:\t$Id\n";
-	    $address->browse_address();
 	    $Id++;
+	    print "ID:\t$Id\n";
+	    $address->browse();
 	}
     }
 
+    method search_Text(Str $searchText) {
+	my $id = 0;
+	foreach my $address ($self->address){
+	    my @contact = ($address->name, $address->lastname, $address->entry_field_values);
+	    $id++;
+	    if(grep{$_=~ $searchText;}@contact){ print "ID:\t\t$id\n"; $address->browse(); } ;
+	}
+    }
 
 }
 
