@@ -2,6 +2,10 @@
 use warnings;
 use strict;
 
+use myAddressBook;
+use myAddress;
+
+my $addressBook = myAddressBook->new();
     
 my $input;
 my $id=0;
@@ -48,33 +52,31 @@ while(1){
 }
 
 sub newAdress{
-    #$id = scalar keys %adresses;
-    $id += 1;
+    print "(newAdress) Enter your name: ";
+    chomp (my $name = <stdin>);
+    
+    print "(newAdress) Enter your lastname: ";
+    chomp (my $lastname = <stdin>);
+
+    my $address = myAddress->new("name" => $name,
+				 "lastname" => $lastname
+	);
+
     while (1){
 	print "(newAdress) ";
 	chomp($input = <stdin>);
-	if(substr($input,0,1) eq "."){
-	    my @tmp = split(//,$input);
-	    shift @tmp;
-	    $input = join "",@tmp;
-	    @inputArray = split(":",$input);
-	    $addresses{"$id"}{"$inputArray[0]"} = "$inputArray[1]";
-	    last;
+	if($input eq "") {redo;}
+	if($input eq "."){last;};
+	if($input =~ ":"){
+	    my($key, $val) = split(":",$input);
+	    $address->entry_field($key,$val);
 	}
-	@inputArray = split(":",$input);
-	$addresses{"$id"}{"$inputArray[0]"} = $inputArray[1];
-	#print "(newAdress) ";
     }
+    $addressBook->add_address($address);
 }
 
 sub list{
-    foreach my $k1 ( sort keys %addresses ) {
-	print "ID\t$k1:\n";
-	foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-	    print "\t$k2\t$addresses{$k1}{$k2}\n";
-	}
-	print "\n";
-    }
+    $addressBook->print_list;
 }
 
 sub browseHelp{
@@ -89,14 +91,8 @@ sub browseHelp{
 
 sub listById{
     my ($curId) = @_;
-    foreach my $k1 ( sort keys %addresses ) {
-	if ($curId eq $k1){
-	    print "ID\t$k1:\n";
-	    foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-		    print "\t$k2\t$addresses{$k1}{$k2}\n";
-	    }
-	}
-	    print "\n";
+    if ($addressBook->address_exists($curId)){
+	$addressBook->get_address($curId)->browse_address;
     }
 }
 
@@ -104,69 +100,91 @@ sub appendAdress{
     my ($curId) = @_;
     print "The adress you want to change:\n\n";
     listById($curId);
-    while (1){
-	print "(appendAddress) ";
-	chomp($input = <stdin>);
-	if(substr($input,0,1) eq "."){
-	    my @tmp = split(//,$input);
-	    shift @tmp;
-	    $input = join "",@tmp;
-	    @inputArray = split(":",$input);
-	    foreach my $k1 ( sort keys %addresses ) {
-		if($curId eq $k1){
-		    foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-			if ($k2 eq $inputArray[0]){
-			    delete $addresses{$k1}{$k2};
-			    $addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-			}
-			else{
-			    $addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-			}
-		    }
-		}
-	    }
-	    last;
-	}
-	@inputArray = split(":",$input);
-
-	foreach my $k1 ( sort keys %addresses ) {
-	    if($curId eq $k1){
-		foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-		    if ($k2 eq $inputArray[0]){
-			delete $addresses{$k1}{$k2};
-			$addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-		    }
-		    else{
-			$addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-		    }
-		}
+    if($addressBook->address_exists($curId)){
+	my $address = $addressBook->get_address($curId);
+	while (1){
+	    print "(appendAddress) ";
+	    chomp($input = <stdin>);
+	    if($input eq "") {redo;}
+	    if($input eq "."){last;};
+	    if($input =~ ":"){
+		my($key, $val)  = split(":",$input);
+		$address->entry_field($key, $val);
 	    }
 	}
-    }    
+    }
 }
 
 sub deleteById{
     my ($curId) = @_;
-    foreach my $k1 ( sort keys %addresses ) {
-	if ($curId eq $k1){
-	    print "ID\t$k1:\n";
-	    foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-		    print "\t$k2\t$addresses{$k1}{$k2}\n";
-		    delete $addresses{$k1}{$k2};
-	    }
-	    delete $addresses{$k1};
-	    print "Deleted\n";
-	}
+    if($addressBook->address_exists($curId)){
+	$addressBook->delete_address($curId);
     }
 }
 
-sub searchText{
-    my ($searchText) = @_;
-    foreach my $k1 ( sort keys %addresses ) {
-	foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-	    if($addresses{$k1}{$k2} =~ $searchText){
-		listById($k1);
-	    }
-	}
-    }
-}
+#sub searchText{
+#    my ($searchText) = @_;
+#    foreach my $k1 ( sort keys %addresses ) {
+#	foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
+#	    if($addresses{$k1}{$k2} =~ $searchText){
+#		listById($k1);
+#	    }
+#	}
+#   }
+#}
+
+=pod
+
+=head1 Name
+
+Addressmangementsystem - Just a small mangementsystem
+
+=head1 
+
+=head1 Usage
+
+F<cli.pl>
+
+=head1
+
+=head1 Helptext
+
+=over 
+
+=item
+
+e = Add a new address:
+	Form: 'key:value'
+	Last item form: '.key:value'
+
+=item
+
+a id = Change or add an adress item: 
+	Form:'key:value'
+	Last item with: '.key:value'
+
+=item
+
+d id = Delete address on this id
+
+=item
+
+l id = Browse address on the given id formated
+
+=item
+
+l = Browse all addresses
+
+=item
+
+h = Help
+
+=item
+
+s text = Search text in all addresses and browse these address
+
+=back
+
+=head1
+
+=cut
