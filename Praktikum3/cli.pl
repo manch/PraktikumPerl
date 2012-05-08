@@ -5,10 +5,11 @@ use Storable qw (store retrieve);
 use myAddressBook;
 use myAddress;
 
+my $addressBook;
 #wird für storeable gebraucht
-if ( -e "data" ){ "print Datei vorhanden\n";}else{print "Datei nicht vorhanden";}; 
+if ( -e "data" ){ $addressBook = retrieve ("data");}else{ my $tmp = myAddressBook->new(); $addressBook = \$tmp;}; 
 
-my $addressBook = myAddressBook->new();
+#my $addressBook = myAddressBook->new();
 my $input;
 my @inputArray;
 
@@ -50,6 +51,8 @@ while(1){
     }
 }
 
+store $addressBook,"data";
+
 sub newAdress{
     print "(newAdress) Enter your name: ";
     chomp (my $name = <stdin>);
@@ -57,9 +60,10 @@ sub newAdress{
     print "(newAdress) Enter your lastname: ";
     chomp (my $lastname = <stdin>);
 
-    my $address = myAddress->new("name" => $name,
+    my $addresstmp = myAddress->new("name" => $name,
 				 "lastname" => $lastname
 	);
+    my $address = \$addresstmp;
 
     while (1){
 	print "(newAdress) ";
@@ -68,32 +72,33 @@ sub newAdress{
 	if($input eq "."){last;};
 	if($input =~ ":"){
 	    my($key, $val) = split(":",$input);
-	    $address->entry_field($key,$val);
+	    ${$address}->entry_field($key,$val);
 	}
     }
-    $addressBook->add_address($address);
+    ${$addressBook}->add_address(${$address});
 }
 
 sub list{
-    $addressBook->print_list;
+    ${$addressBook}->print_list;
 }
 
 sub browseHelp{
-    print "e\tAdd a new address\n\tForm: 'key:value'\n\tFinish with '.'\n\n";
-    print "a id\tChange or add an adress item: 'key:value'\n\tFinish with '.'\n\n";
-    print "d id\tDelete address on this id\n\n";
-    print "l id\tBrowse address on the given id formated\n\n";
-    print "l\tBrowse all addresses\n\n";
-    print "h\tHelp\n\n";
-    print "s text\tSearch text in all addresses and browse these address\n\n";
+    print "e\t\tAdd a new address\n\t\tForm: 'key:value'\n\t\tFinish with '.'\n\n";
+    print "a id\t\tChange or add an adress item: 'key:value'\n\t\tFinish with '.'\n\n";
+    print "d id\t\tDelete address on this id\n\n";
+    print "l id\t\tBrowse address on the given id formated\n\n";
+    print "l\t\tBrowse all addresses\n\n";
+    print "h\t\tHelp\n\n";
+    print "s text\t\tSearch text in all addresses and browse these address\n\n";
+    print "q, quit, exit\tShutdown and save.\n\n";
 }
 
 sub listById{
     my ($curId) = @_;
     my $realId = $curId - 1;
-    if ($addressBook->address_exists($realId)){
+    if (${$addressBook}->address_exists($realId)){
 	print "ID:\t\t$curId\n";
-	$addressBook->get_address($realId)->browse;
+	${$addressBook}->get_address($realId)->browse;
     }
 }
 
@@ -102,8 +107,8 @@ sub appendAdress{
     print "The adress you want to change:\n\n";
     listById($curId);
     $curId--;
-    if($addressBook->address_exists($curId)){
-	my $address = $addressBook->get_address($curId);
+    if(${$addressBook}->address_exists($curId)){
+	my $address = ${$addressBook}->get_address($curId);
 	while (1){
 	    print "(appendAddress) ";
 	    chomp($input = <stdin>);
@@ -120,16 +125,16 @@ sub appendAdress{
 sub deleteById{
     my ($curId) = @_;
     $curId--;
-    if($addressBook->address_exists($curId)){
-	$addressBook->get_address($curId)->browse;
+    if(${$addressBook}->address_exists($curId)){
+	${$addressBook}->get_address($curId)->browse;
 	print "Address deleted!\n";
-	$addressBook->delete_address($curId);
+	${$addressBook}->delete_address($curId);
     }
 }
 
 sub searchText{
     my ($searchText) = @_;
-    $addressBook->search_Text($searchText);
+    ${$addressBook}->search_Text($searchText);
 }
 
 =pod
