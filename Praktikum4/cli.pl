@@ -49,6 +49,7 @@ while(1){
     }
 }
 
+$dbh->disconnect;
 
 sub newAdress{
     $id = checkID();
@@ -79,12 +80,12 @@ sub list{
 	print "ID:\t\t$row[0]\n";
 	print "Name:\t\t$row[1]\n";
 	print "Lastname:\t$row[2]\n";
-	my @entries;
-	my $exe;
-	$exe = $dbh->prepare("SELECT * FROM 'base_entry' WHERE id=$row[0]");
-	$exe->execute();
-	while(@entries = $exe->fetchrow_array){
-	    print "$entries[1]\t\t$entries[2]\n";
+	my @row2;
+	my $sth2;
+	$sth2 = $dbh->prepare("SELECT * FROM 'base_entry' WHERE id=$row[0]");
+	$sth2->execute();
+	while(@row2 = $sth2->fetchrow_array){
+	    print "$row2[1]\t\t$row2[2]\n";
 	}
 	print "\n";
     }
@@ -117,9 +118,9 @@ sub listById{
 	    print "$row2[1]\t\t$row2[2]\n";
 	}
     }
+    print "\n";
 }
 
-#Geht noch nicht muss noch gemacht werden von vorn
 sub appendAdress{
     my ($curId) = @_;
     print "The adress you want to change:\n\n";
@@ -133,7 +134,35 @@ sub appendAdress{
 	    if($input eq "."){last;};
 	    if($input =~ ":"){
 		my($key, $val)  = split(":",$input);
-		$dbh->do("INSERT INTO 'base_entry' (id, key, value) VALUES ($id, '$key', '$val')");
+		my $insert_update;
+		if($key eq "Name" or $key eq "Lastname"){
+		    if($key eq "Name"){
+			$insert_update = $dbh->prepare("UPDATE 'base' SET name=? WHERE id=$curId");
+		    }else{
+			$insert_update = $dbh->prepare("UPDATE 'base' SET lastname=? WHERE id=$curId");
+		    }
+		    $insert_update->execute($val);
+		    $insert_update->finish;
+
+		}else{
+		    my $sth = $dbh->prepare("SELECT key FROM 'base_entry' WHERE id=$curId");
+		    $sth->execute;
+		    my $updated = 0;
+		    while(my @row = $sth->fetchrow_array){
+			if($row[0] eq $key){
+			    $insert_update = $dbh->prepare("UPDATE 'base_entry' SET value=? WHERE id=$curId AND key='$key'");
+			    $insert_update->execute($val);
+			    $insert_update->finish;
+			    $updated = 1;
+			}
+		    } 
+		    if($updated == 0){
+			$insert_update = $dbh->prepare("INSERT INTO 'base_entry' (id, key, value) VALUES ($curId, '$key', '$val')");
+			$insert_update->execute;
+		    }
+		    
+		}
+		
 	    }
 	}
 #    }
@@ -145,10 +174,26 @@ sub deleteById{
     $dbh->do("DELETE FROM 'base_entry' WHERE id=$curId");
 }
 
-#sub searchText{
-#    my ($searchText) = @_;
-#    ${$addressBook}->search_Text($searchText);
-#}
+sub searchText{
+    my ($searchText) = @_;
+    my $sth = $dbh->prepare("SELECT * FROM 'base'");
+    $sth->execute;
+    my @row;
+    while(@row = $sth->fetchrow_array){
+	if($row[1] =~ $searchText or $row[2] =~ $searchText){
+	    listById($row[0]);
+	}else{
+	    my $sth2 = $dbh->prepare("SELECT * FROM 'base_entry' WHERE id=$row[0]");
+	    $sth2->execute;
+	    my @row2;
+	    while(@row2 = $sth2->fetchrow_array){
+		if($row2[2] =~ $searchText){
+		    listById($row2[0]);
+		}
+	    }
+	}
+    }
+}
 
 sub checkID{
     my $sth = $dbh->prepare("SELECT id FROM base");
