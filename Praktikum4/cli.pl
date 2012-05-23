@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
-use myAddressBook;
-use myAddress;
 use DBI;
 use List::Util qw (max);
 

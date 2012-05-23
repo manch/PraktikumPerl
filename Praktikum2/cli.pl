@@ -54,8 +54,10 @@ sub newAdress{
 	chomp($input = <stdin>);
 	if($input eq "") {redo;}
 	if($input eq "."){last;};
-	@inputArray = split(":",$input);
-	$addresses{"$id"}{"$inputArray[0]"} = $inputArray[1];
+	if($input =~ ":"){
+	    @inputArray = split(":",$input);
+	    $addresses{"$id"}{"$inputArray[0]"} = $inputArray[1];
+	}
     }
 }
 
@@ -76,43 +78,58 @@ sub browseHelp{
     print "s text\tSearch text in all addresses and browse these address\n\n";
 }
 
-sub listById{
+sub addressExists{
     my ($curId) = @_;
     foreach my $k1 ( sort keys %addresses ) {
 	if ($curId eq $k1){
-	    print "ID\t$k1:\n";
-	    foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-		    print "\t$k2\t$addresses{$k1}{$k2}\n";
-	    }
+	    return 1;
 	}
+    }
+}
+
+sub listById{
+    my ($curId) = @_;
+    if( addressExists($curId) == 1 ){
+	foreach my $k1 ( sort keys %addresses ) {
+	    if ($curId eq $k1){
+		print "ID\t$k1:\n";
+		foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
+		    print "\t$k2\t$addresses{$k1}{$k2}\n";
+		}
+	    }
 	    print "\n";
+	}
     }
 }
 
 sub appendAdress{
     my ($curId) = @_;
-    print "The adress you want to change:\n\n";
-    listById($curId);
-    while (1){
-	print "(appendAddress) ";
-	chomp($input = <stdin>);
-	if($input eq "") {redo;}
-	if($input eq "."){last;};
-	@inputArray = split(":",$input);
-	foreach my $k1 ( sort keys %addresses ) {
-	    if($curId eq $k1){
-		foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
-		    if ($k2 eq $inputArray[0]){
-			delete $addresses{$k1}{$k2};
-			$addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
-		    }
-		    else{
-			$addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
+    if( addressExists($curId) == 1){
+	print "The adress you want to change:\n\n";
+	listById($curId);
+	while (1){
+	    print "(appendAddress) ";
+	    chomp($input = <stdin>);
+	    if($input eq "") {redo;}
+	    if($input eq "."){last;};
+	    if($input =~ ":"){
+		@inputArray = split(":",$input);
+		foreach my $k1 ( sort keys %addresses ) {
+		    if($curId eq $k1){
+			foreach my $k2 ( sort keys %{$addresses{$k1}} ) {
+			    if ($k2 eq $inputArray[0]){
+				delete $addresses{$k1}{$k2};
+				$addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
+			    }
+			    else{
+				$addresses{"$curId"}{"$inputArray[0]"}= $inputArray[1];
+			    }
+			}
 		    }
 		}
 	    }
 	}
-    }    
+    }
 }
 
 sub deleteById{

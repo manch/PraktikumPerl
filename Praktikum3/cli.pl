@@ -104,10 +104,10 @@ sub listById{
 
 sub appendAdress{
     my ($curId) = @_;
-    print "The adress you want to change:\n\n";
-    listById($curId);
     $curId--;
-    if(${$addressBook}->address_exists($curId)){
+    if (${$addressBook}->address_exists($curId)){
+	print "The adress you want to change:\n\n";
+	listById($curId+1);
 	my $address = ${$addressBook}->get_address($curId);
 	while (1){
 	    print "(appendAddress) ";
@@ -116,11 +116,18 @@ sub appendAdress{
 	    if($input eq "."){last;};
 	    if($input =~ ":"){
 		my($key, $val)  = split(":",$input);
-		$address->entry_field($key, $val);
+		if($key eq "Name"){
+		    $address->name($val);
+		}elsif($key eq "Lastname"){
+		    $address->lastname($val);
+		}else{
+		    $address->entry_field($key, $val);
+		}
 	    }
 	}
     }
 }
+
 
 sub deleteById{
     my ($curId) = @_;
