@@ -1,0 +1,87 @@
+sub finish{
+    $dbh->disconnect;
+}
+
+
+
+
+sub browseHelp{
+    print "e\t\tAdd a new address\n\t\tForm: 'key:value'\n\t\tFinish with '.'\n\n";
+    print "a id\t\tChange or add an adress item: 'key:value'\n\t\tFinish with '.'\n\n";
+    print "d id\t\tDelete address on this id\n\n";
+    print "l id\t\tBrowse address on the given id formated\n\n";
+    print "l\t\tBrowse all addresses\n\n";
+    print "h\t\tHelp\n\n";
+    print "s text\t\tSearch text in all addresses and browse these address\n\n";
+    print "q, quit, exit\tShutdown and save.\n\n";
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+1;
+
+=pod
+
+=head1 Name
+
+Addressmangementsystem - Just a small mangementsystem
+
+=head1 
+
+=head1 Usage
+
+F<cli.pl>
+
+=head1
+
+=head1 Helptext
+
+=over 
+
+=item
+
+e = Add a new address:
+	Form: 'key:value'
+	Last item form: '.key:value'
+
+=item
+
+a id = Change or add an adress item: 
+	Form:'key:value'
+	Last item with: '.key:value'
+
+=item
+
+d id = Delete address on this id
+
+=item
+
+l id = Browse address on the given id formated
+
+=item
+
+l = Browse all addresses
+
+=item
+
+h = Help
+
+=item
+
+s text = Search text in all addresses and browse these address
+
+=back
+
+=head1
+
+=cut
