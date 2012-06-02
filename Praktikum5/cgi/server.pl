@@ -322,60 +322,124 @@ sub checkID{
     return ((max @tmp)+1);
 }
 
+sub idExists{
+    my ($curId) = @_;
+    my $dbh = DBI::->connect("dbi:SQLite:dbname=myAddManSys.db","","");
+    my $sth = $dbh->prepare('SELECT * FROM "base" WHERE id='.$curId);
+    $sth->execute();
+    while (my @row = $sth->fetchrow_array){
+	$dbh->disconnect;
+	return 1;
+    }
+    $dbh->disconnect;
+    return 0;
+}
 
 sub appendAddress{
     my ($curId, $name, $lastname, $keysnvalues) = @_;
     chomp($keysnvalues);
-    my $dbh = DBI::->connect("dbi:SQLite:dbname=myAddManSys.db","",""); 
-    my $insert_update;
-    if($name ne ""){
-	$insert_update = $dbh->prepare("UPDATE 'base' SET name=? WHERE id=$curId");
-	$insert_update->execute($name);
-	$insert_update->finish;
-    }
-    if($lastname ne ""){
-	$insert_update = $dbh->prepare("UPDATE 'base' SET lastname=? WHERE id=$curId");
-	$insert_update->execute($lastname);
-	$insert_update->finish;
-    }
-    if($keysnvalues ne ""){
-	my $sth = $dbh->prepare("SELECT key FROM 'base_entry' WHERE id=$curId");
-	$sth->execute;
-	my $updated = 0;
-	if($keysnvalues =~ ","){
-	    my @entries = split(",",$keysnvalues);
+    if(idExists($curId) == 1){
+	my $dbh = DBI::->connect("dbi:SQLite:dbname=myAddManSys.db","",""); 
+	my $insert_update;
 	
-	    while(my @row = $sth->fetchrow_array){
-		foreach my $entry (@entries){
-		    my ($key, $val) = split(":",$entry);
-		    if($row[0] eq $key){
-			$insert_update = $dbh->prepare("UPDATE 'base_entry' SET value=? WHERE id=$curId AND key='$key'");
-			$insert_update->execute($val);
-			$insert_update->finish;
-			$updated = 1;
-		    }
-		}
-	    } 
-	}else{
-	    if($keysnvalues =~ ":"){
-		while(my @row = $sth->fetchrow_array){
-		    my ($key, $val) = split(":",$keysnvalues);
-		    if($row[0] eq $key){
-			$insert_update = $dbh->prepare("UPDATE 'base_entry' SET value=? WHERE id=$curId AND key='$key'");
-			$insert_update->execute($val);
-			$insert_update->finish;
-			$updated = 1;
-		    }
-		}
-	    }   
+	if($name ne ""){
+	    $insert_update = $dbh->prepare("UPDATE 'base' SET name=? WHERE id=$curId");
+	    $insert_update->execute($name);
+	    $insert_update->finish;
 	}
-    	if($updated == 0){
-	    $insert_update = $dbh->prepare("INSERT INTO 'base_entry' (id, key, value) VALUES ($curId, '$key', '$val')");
-	    $insert_update->execute;
+
+	if($lastname ne ""){
+	    $insert_update = $dbh->prepare("UPDATE 'base' SET lastname=? WHERE id=$curId");
+	    $insert_update->execute($lastname);
+	    $insert_update->finish;
+	}
+
+	if($keysnvalues ne ""){
+	    my $sth = $dbh->prepare('SELECT key FROM "base_entry" WHERE id='.$curId);
+	    $sth->execute;
+	    my $updated = 0;
+	    if($keysnvalues =~ ","){
+		my @entries = split(",",$keysnvalues);
+		foreach my $entry (@entries){
+		    if($entry =~ ":"){
+			my ($key, $val) = split(":",$entry);
+			while(my @row = $sth->fetchrow_array){
+			    if($row[0] eq $key){
+				$insert_update = $dbh->prepare('UPDATE "base_entry" SET value="'.$val.'" WHERE id='.$curId.' AND key="'.$key.'"');
+				$insert_update->execute();
+				$insert_update->finish;
+				$updated = 1;
+			    } 
+			}
+			if ($updated == 0){
+			    	$insert_update = $dbh->prepare('INSERT INTO "base_entry" (id, key, value) VALUES ('.$curId.', "'.$key.'", "'.$val.'")');
+				$insert_update->execute;
+			}else{
+			    $updated = 0;
+			}
+		    }
+		}
+	    }elsif($keysnvalues =~ ":"){
+		my ($key,$val) = split(":",$keysnvalues);
+		while(my @row = $sth->fetchrow_array){
+		    if($row[0] eq $key){
+			$insert_update = $dbh->prepare('UPDATE "base_entry" SET value="'.$val.'" WHERE id='.$curId.' AND key="'.$key.'"');
+			$insert_update->execute();
+			$insert_update->finish;
+			$updated = 1;
+		    }
+		}
+		if($updated == 0){
+		    $insert_update = $dbh->prepare('INSERT INTO "base_entry" (id, key, value) VALUES ('.$curId.', "'.$key.'", "'.$val.'")');
+		    $insert_update->execute;
+		}else{
+		    $updated = 0;
+		}
+	    }
 	}
     }
     $dbh->disconnect;
 }
+#		while(my @row = $sth->fetchrow_array){
+#		    foreach my $entry (@entries){
+#			if($entry =~ ":"){
+#			    my ($key, $val) = split(":",$entry);
+#			    if($row[0] eq $key){
+#				$insert_update = $dbh->prepare('UPDATE "base_entry" SET value="$val" WHERE id='.$curId.' AND key="$key"');
+#				$insert_update->execute();
+#				$insert_update->finish;
+#				$updated = 1;
+#			    }else{
+#				$insert_update = $dbh->prepare('INSERT INTO "base_entry" (id, key, value) VALUES ('.$curId.', $key, $val)');
+#				$insert_update->execute;
+#			    }
+#			}
+#		    } 
+#		}
+#		
+#		
+#	    }else{
+#		if($keysnvalues =~ ":"){
+#		    while(my @row = $sth->fetchrow_array){
+#			my ($key, $val) = split(":",$keysnvalues);
+#			if($row[0] eq $key){
+#			    $insert_update = $dbh->prepare("UPDATE 'base_entry' SET value=? WHERE id=$curId AND key='$key'");
+#			    $insert_update->execute($val);
+#			    $insert_update->finish;
+#			    $updated = 1;
+#			}
+#		    }
+#		}
+#		if($updated == 0){
+#		    $insert_update = $dbh->prepare('INSERT INTO "base_entry" (id, key, value) VALUES ('.$curId.', $key, $val)');
+#		    $insert_update->execute;
+#		}
+#	    }
+#	    }
+#	    $dbh->disconnect;
+#	}
+ #   }
+#}
 
 
 } 
@@ -383,3 +447,62 @@ sub appendAddress{
 # start the server on port 8080
 my $pid = MyWebServer->new(8080)->background();
 print "Use 'kill $pid' to stop server.\n";
+
+
+
+
+=pod
+
+=head1 Name
+
+Addressmangementsystem - Just a small mangementsystem
+
+=head1 
+
+=head1 Usage
+
+F<cli.pl>
+
+=head1
+
+=head1 Helptext
+
+=over 
+
+=item
+
+e = Add a new address:
+	Form: 'key:value'
+	Last item form: '.key:value'
+
+=item
+
+a id = Change or add an adress item: 
+	Form:'key:value'
+	Last item with: '.key:value'
+
+=item
+
+d id = Delete address on this id
+
+=item
+
+l id = Browse address on the given id formated
+
+=item
+
+l = Browse all addresses
+
+=item
+
+h = Help
+
+=item
+
+s text = Search text in all addresses and browse these address
+
+=back
+
+=head1
+
+=cut
